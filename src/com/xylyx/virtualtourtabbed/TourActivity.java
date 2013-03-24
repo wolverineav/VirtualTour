@@ -1,36 +1,61 @@
 package com.xylyx.virtualtourtabbed;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-public class TourActivity extends Activity {
+public class TourActivity extends ListActivity {
+	
+	public final static String INV_OBJ_ID = "com.xylyx.VirtualTour.INV_OBJ_ID";
 
+	/**
+	 * The DB connection for the relevant Sites. First screen requires the site data only,
+	 * not the objects within the Site. 
+	 * */
+	private InventoryObjectDAO inventoryDAO;
+	
+	private static ArrayAdapter<InventoryObject> adapter;
+	// This is the Adapter being used to display the list's data
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_tour);
+		
 		// Show the Up button in the action bar.
 		// Make sure we're running on Honeycomb or higher to use ActionBar APIs
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
         	getActionBar().setDisplayHomeAsUpEnabled(true);
         }
         
-        Intent intent = getIntent();
-        String message = intent.getStringExtra(StartActivity.EXTRA_MESSAGE);
+        //String message = intent.getStringExtra(StartActivity.EXTRA_MESSAGE);
+        //long siteId = intent.getLongExtra(StartActivity.SITE_ID, 0);
         
-        // Create the text view
-        TextView textView = new TextView(this);
-        textView.setTextSize(40);
-        textView.setText(message);
-
-        // Set the text view as the activity layout
-        setContentView(textView);
+      //Setup the database connection
+      		inventoryDAO = new InventoryObjectDAO(this);
+      		inventoryDAO.open();
+      		
+      		adapter = new ArrayAdapter<InventoryObject>(this, android.R.layout.simple_list_item_1);
+      		//adapter = new ArrayAdapter<SiteObject>(this, android.R.layout.simple_list_item_1, values);
+      		
+      		//Add objects to the db
+      		InventoryObject invObject = null;
+      		String[] invObjects = new String[] { "Aurdino", "MacBook Air", "BhakBencho"};
+      		String[] invObjectsInfo = new String[] { "Aurdino: in dino dil mera..", 
+      				"MacBook Air: hawa hawai!", "BhakBencho: kya chutyaap hai!"};
+      		for(int i=0; i<invObjects.length; i++){
+      			invObject = inventoryDAO.createInventoryObject(invObjects[i], "txt", invObjectsInfo[i]);
+      			adapter.add(invObject);
+      		}
+      		adapter.notifyDataSetChanged();
+      		
+      		setListAdapter(adapter);      	
 	}
 
 	@Override
@@ -56,5 +81,14 @@ public class TourActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id){
+		
+		Intent intent = new Intent(v.getContext() , InfoDisplayActivity.class);
+		InventoryObject invObj = (InventoryObject) getListView().getItemAtPosition(position);
+		intent.putExtra(INV_OBJ_ID, invObj.getId());
+		startActivity(intent);
+	}
+	
 }

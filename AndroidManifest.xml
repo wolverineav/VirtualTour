@@ -30,6 +30,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.xylyx.virtualtourtabbed.StartActivity" />
         </activity>
+        <activity
+            android:name="com.xylyx.virtualtourtabbed.InfoDisplayActivity"
+            android:label="@string/title_activity_info_display"
+            android:parentActivityName="com.xylyx.virtualtourtabbed.TourActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.xylyx.virtualtourtabbed.TourActivity" />
+        </activity>
     </application>
 
 </manifest>

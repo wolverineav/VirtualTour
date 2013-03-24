@@ -1,8 +1,5 @@
 package com.xylyx.virtualtourtabbed;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -26,7 +23,8 @@ import android.widget.TextView;
 public class StartActivity extends FragmentActivity implements
 		ActionBar.TabListener {
 
-	public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+	//public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+	public final static String SITE_ID = "com.xylyx.VirtualTour.SITEID";
 	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -42,16 +40,48 @@ public class StartActivity extends FragmentActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-
+	
+	/**
+	 * The DB connection for the relevant Sites. First screen requires the site data only,
+	 * not the objects within the Site. 
+	 * */
+	private SiteObjectDAO siteDAO;
+	
+	protected static ArrayAdapter<SiteObject> adapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
-
+		
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
+		
+		//Setup the database connection
+		siteDAO = new SiteObjectDAO(this);
+		siteDAO.open();
+		
+		adapter = new ArrayAdapter<SiteObject>(this, android.R.layout.simple_list_item_1);
+		//adapter = new ArrayAdapter<SiteObject>(this, android.R.layout.simple_list_item_1, values);
+		
+		//Add objects to the db
+		SiteObject site = null;
+		String[] siteNames = new String[] { "Hunt Library", "Centennial Campus"};
+		for(int i=0; i<siteNames.length; i++){
+			site = siteDAO.createSiteObject(siteNames[i]);
+			adapter.add(site);
+		}
+		adapter.notifyDataSetChanged();
+		
+		//List<SiteObject> values = siteDAO.getAllSiteObjects();
+		
+		// Use the SimpleCursorAdapter to show the
+	    // elements in a ListView
+		
+		
+		
+		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -83,10 +113,23 @@ public class StartActivity extends FragmentActivity implements
 					.setTabListener(this));
 		}
 	}
+	
+	@Override
+	  protected void onResume() {
+	    siteDAO.open();
+	    super.onResume();
+	  }
+
+	  @Override
+	  protected void onPause() {
+	    siteDAO.close();
+	    super.onPause();
+	  }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
+		menu.add("Add Sites to DB");
 		getMenuInflater().inflate(R.menu.activity_start, menu);
 		return true;
 	}
@@ -173,6 +216,7 @@ public class StartActivity extends FragmentActivity implements
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
+		
 
 		public BrowseFragment() {
 		}
@@ -186,25 +230,20 @@ public class StartActivity extends FragmentActivity implements
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			
-			//Array list of maps
-			List<String> mapList = new ArrayList<String>();
-			mapList.add("Hunt Library");
-			mapList.add("Centennial Campus");			
-			
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(inflater.getContext(), android.R.layout.simple_list_item_1, mapList);
-			
-			setListAdapter(adapter);
+
+			//Array list of maps			
+			setListAdapter(StartActivity.adapter);
 			
 			return super.onCreateView(inflater, container, savedInstanceState);
 		}
 		
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id){
+			
 			Intent intent = new Intent(getActivity(), TourActivity.class);
-			String message = (String) getListView().getItemAtPosition(position);
-			intent.putExtra(EXTRA_MESSAGE, message);
-			startActivity(intent);		
+			SiteObject site = (SiteObject) getListView().getItemAtPosition(position);
+			intent.putExtra(SITE_ID, site.getId());
+			startActivity(intent);
 		}
 		
 	}
@@ -235,4 +274,5 @@ public class StartActivity extends FragmentActivity implements
 			return textView;
 		}
 	}
+
 }
