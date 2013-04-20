@@ -1,4 +1,4 @@
-package com.xylyx.virtualtourtabbed;
+package com.xylyx.virtualtourtabbed.DAO;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,18 +11,19 @@ public class VTSQLiteHelper extends SQLiteOpenHelper {
 	//public static final String TABLE_COMMENTS = "comments";
 	public static final String TABLE_SITE = "site";
 	public static final String TABLE_INVENTORY = "inventory";
-	public static final String TABLE_SITEINVENTORY = "siteinventory";
+//	public static final String TABLE_SITEINVENTORY = "siteinventory";
 	//Every table has primary key:
 	public static final String COLUMN_ID = "_id";
 	//Site Table
 	public static final String COLUMN_SITENAME = "sitename";
 	//Inventory Table
+	public static final String COLUMN_SITEID = "siteid";
 	public static final String COLUMN_OBJNAME = "objname";
 	public static final String COLUMN_MEDIATYPE = "mediatype";
 	public static final String COLUMN_MEDIA = "media";
 	//SiteInventory Table
-	public static final String COLUMN_SITEID = "siteid";
-	public static final String COLUMN_INVENTORYID = "inventoryid";
+//	public static final String COLUMN_SITEID = "siteid";
+//	public static final String COLUMN_INVENTORYID = "inventoryid";
 	//DB name and version used while opening the connection
 	private static final String DATABASE_NAME = "virtualtour.db";
 	private static final int DATABASE_VERSION = 1;
@@ -34,14 +35,14 @@ public class VTSQLiteHelper extends SQLiteOpenHelper {
 			+ " text not null);";
 	private static final String CREATE_INVENTORY_TABLE = "create table "
 			+ TABLE_INVENTORY + "(" + COLUMN_ID
-			+ " integer primary key autoincrement, " + COLUMN_OBJNAME
-			+ " text not null, " + COLUMN_MEDIATYPE + " text not null, "
-			+ COLUMN_MEDIA + " text not null);";
-	private static final String CREATE_SITEINV_TABLE = "create table "
-			+ TABLE_SITEINVENTORY + "(" + COLUMN_ID
-			+ " integer primary key autoincrement, "
-			+ "FOREIGN KEY (" + COLUMN_SITEID + ") REFERENCES "+ TABLE_SITE +" (" + COLUMN_ID + "), "
-			+ "FOREIGN KEY (" + COLUMN_INVENTORYID + ") REFERENCES "+ TABLE_INVENTORY +" (" + COLUMN_ID + "));";
+			+ " integer primary key autoincrement, " + COLUMN_SITEID 
+			+ " integer not null, " + COLUMN_OBJNAME + " text not null, "
+			+ COLUMN_MEDIATYPE + " integer not null, " + COLUMN_MEDIA + " text not null);";
+//	private static final String CREATE_SITEINV_TABLE = "create table "
+//			+ TABLE_SITEINVENTORY + "(" + COLUMN_ID
+//			+ " integer primary key autoincrement, "
+//			+ "FOREIGN KEY (" + COLUMN_SITEID + ") REFERENCES "+ TABLE_SITE +" (" + COLUMN_ID + "), "
+//			+ "FOREIGN KEY (" + COLUMN_INVENTORYID + ") REFERENCES "+ TABLE_INVENTORY +" (" + COLUMN_ID + "));";
 			
 
 	public VTSQLiteHelper(Context context, String name, CursorFactory factory,

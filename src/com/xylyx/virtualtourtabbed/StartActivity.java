@@ -1,5 +1,6 @@
 package com.xylyx.virtualtourtabbed;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -20,11 +21,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.xylyx.virtualtourtabbed.DAO.SiteObjectDAO;
+import com.xylyx.virtualtourtabbed.Objects.SiteObject;
+
+@SuppressLint("DefaultLocale")
 public class StartActivity extends FragmentActivity implements
 		ActionBar.TabListener {
 
 	//public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 	public final static String SITE_ID = "com.xylyx.VirtualTour.SITEID";
+	public final static String SITE_IDS = "com.xylyx.VirtualTour.SITEIDS";
 	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -192,6 +198,7 @@ public class StartActivity extends FragmentActivity implements
 			return 2;
 		}
 
+		@SuppressLint("DefaultLocale")
 		@Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
@@ -243,6 +250,17 @@ public class StartActivity extends FragmentActivity implements
 			Intent intent = new Intent(getActivity(), TourActivity.class);
 			SiteObject site = (SiteObject) getListView().getItemAtPosition(position);
 			intent.putExtra(SITE_ID, site.getId());
+			
+			int count = adapter.getCount();
+			long[] siteIdList = new long[count];
+			//intent.putExtra("COUNT", count);
+			SiteObject so;
+			for(int i=0; i<count; i++){
+				so = (SiteObject) getListView().getItemAtPosition(i);
+				siteIdList[i] = so.getId();
+				//intent.putExtra("SITE"+i, so.getId());						
+			}
+			intent.putExtra(SITE_IDS, siteIdList);
 			startActivity(intent);
 		}
 		

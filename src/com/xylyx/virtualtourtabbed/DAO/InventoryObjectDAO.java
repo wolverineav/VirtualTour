@@ -1,7 +1,9 @@
-package com.xylyx.virtualtourtabbed;
+package com.xylyx.virtualtourtabbed.DAO;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.xylyx.virtualtourtabbed.Objects.InventoryObject;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,9 +17,9 @@ public class InventoryObjectDAO {
 	  private VTSQLiteHelper dbHelper;
 	  private String[] allColumnsInv = { VTSQLiteHelper.COLUMN_ID,
 	      VTSQLiteHelper.COLUMN_OBJNAME, VTSQLiteHelper.COLUMN_MEDIATYPE,
-	      VTSQLiteHelper.COLUMN_MEDIA };
-	  private String[] allColumnsSiteInv = { VTSQLiteHelper.COLUMN_ID,
-			  VTSQLiteHelper.COLUMN_SITEID, VTSQLiteHelper.COLUMN_INVENTORYID };
+	      VTSQLiteHelper.COLUMN_MEDIA, VTSQLiteHelper.COLUMN_SITEID };
+//	  private String[] allColumnsSiteInv = { VTSQLiteHelper.COLUMN_ID,
+//			  VTSQLiteHelper.COLUMN_SITEID, VTSQLiteHelper.COLUMN_INVENTORYID };
 
 	  public InventoryObjectDAO(Context context) {
 	    dbHelper = new VTSQLiteHelper(context);
@@ -31,11 +33,12 @@ public class InventoryObjectDAO {
 	    dbHelper.close();
 	  }
 
-	  public InventoryObject createInventoryObject(String objectName, String mediaType, String media) {
+	  public InventoryObject createInventoryObject(String objectName, int mediaType, String media, long siteId) {
 	    ContentValues values = new ContentValues();
 	    values.put(VTSQLiteHelper.COLUMN_OBJNAME, objectName);
 	    values.put(VTSQLiteHelper.COLUMN_MEDIATYPE, mediaType);
 	    values.put(VTSQLiteHelper.COLUMN_MEDIA, media);
+	    values.put(VTSQLiteHelper.COLUMN_SITEID, siteId);
 	    try{
 	    long insertId = database.insert(VTSQLiteHelper.TABLE_INVENTORY, null,
 	        values);
@@ -47,9 +50,8 @@ public class InventoryObjectDAO {
 		    cursor.close();
 		    return newObjectName;
 	    } catch (Exception excptn){
-	    	System.out.println("excpt while inset invObj: " + excptn.getMessage());	    	
+	    	System.out.println("exception while insert invObj: " + excptn.getMessage());	    	
 	    }
-	    
 	    return null;
 	  }
 
@@ -72,13 +74,18 @@ public class InventoryObjectDAO {
 		  return invObj;
 		  
 	  }
-	  public List<InventoryObject> getAllInventoryObjects(long inventoryObjID) {
+	  public List<InventoryObject> getAllInventoryObjects(long siteObjID) {
 	    List<InventoryObject> inventoryObjects = new ArrayList<InventoryObject>();
 
 	    //Cursor cursor = database.query(VTSQLiteHelper.TABLE_SITE, allColumns, null, null, null, null, null);
 	    //String siteId = String.valueOf(siteID);
-	    String[] invObjId = {String.valueOf(inventoryObjID)};
-	    Cursor cursor = database.rawQuery("select * from inventory where _ID IN (select inventoryid from siteinventory where siteid = ?)", invObjId);
+//	    String[] invObjId = {String.valueOf(inventoryObjID)};
+//	    String[] siteId = {String.valueOf(siteObjID)};
+	    //Cursor cursor = database.rawQuery("select * from inventory where _ID IN (select inventoryid from siteinventory where siteid = ?)", invObjId);
+//	    Cursor newcursor = database.query(VTSQLiteHelper.TABLE_INVENTORY, allColumnsInv,
+//				  VTSQLiteHelper.COLUMN_ID + " = " + inventoryObjID, null, null, null, null);
+	    Cursor cursor = database.query(VTSQLiteHelper.TABLE_INVENTORY, allColumnsInv,
+	    		VTSQLiteHelper.COLUMN_SITEID + " = " + siteObjID, null, null, null, null);
 
 	    cursor.moveToFirst();
 	    while (!cursor.isAfterLast()) {
@@ -95,8 +102,9 @@ public class InventoryObjectDAO {
 		InventoryObject inventoryObject = new InventoryObject();
 	    inventoryObject.setId(cursor.getLong(0));
 	    inventoryObject.setObjName(cursor.getString(cursor.getColumnIndex(VTSQLiteHelper.COLUMN_OBJNAME)));
-	    inventoryObject.setMediaType(cursor.getString(cursor.getColumnIndex(VTSQLiteHelper.COLUMN_MEDIATYPE)));
+	    inventoryObject.setMediaType(cursor.getInt(cursor.getColumnIndex(VTSQLiteHelper.COLUMN_MEDIATYPE)));
 	    inventoryObject.setMedia(cursor.getString(cursor.getColumnIndex(VTSQLiteHelper.COLUMN_MEDIA)));
+	    inventoryObject.setSiteId(cursor.getLong(cursor.getColumnIndex(VTSQLiteHelper.COLUMN_SITEID)));
 	    return inventoryObject;
 	  }
 

@@ -1,4 +1,4 @@
-package com.xylyx.virtualtourtabbed;
+package com.xylyx.virtualtourtabbed.Objects;
 
 public class SiteObject {
 	private long id;

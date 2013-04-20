@@ -1,7 +1,9 @@
-package com.xylyx.virtualtourtabbed;
+package com.xylyx.virtualtourtabbed.DAO;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.xylyx.virtualtourtabbed.Objects.SiteObject;
 
 import android.content.ContentValues;
 import android.content.Context;

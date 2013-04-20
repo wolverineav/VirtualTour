@@ -1,10 +1,18 @@
 package com.xylyx.virtualtourtabbed;
 
+import java.util.Iterator;
+import java.util.List;
+
+import com.xylyx.virtualtourtabbed.DAO.CONSTANTS;
+import com.xylyx.virtualtourtabbed.DAO.InventoryObjectDAO;
+import com.xylyx.virtualtourtabbed.Objects.InventoryObject;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,8 +42,14 @@ public class TourActivity extends ListActivity {
         	getActionBar().setDisplayHomeAsUpEnabled(true);
         }
         
-        //String message = intent.getStringExtra(StartActivity.EXTRA_MESSAGE);
-        //long siteId = intent.getLongExtra(StartActivity.SITE_ID, 0);
+        Intent intent = getIntent();
+        //String message = intent.getStringExtra(StartActivity.SITE_ID);
+        long siteId = intent.getLongExtra(StartActivity.SITE_ID, 0);
+        long[] siteIdList = intent.getLongArrayExtra(StartActivity.SITE_IDS);
+        Log.v("**** TourActivity ****", " siteID recvd is : " + siteId);
+        for(int i=0; i<siteIdList.length; i++){
+        	Log.v("**** TourActivity ****", " siteIdList["+i+"]: " + siteIdList[i]);        	
+        }
         
       //Setup the database connection
       		inventoryDAO = new InventoryObjectDAO(this);
@@ -46,13 +60,22 @@ public class TourActivity extends ListActivity {
       		
       		//Add objects to the db
       		InventoryObject invObject = null;
-      		String[] invObjects = new String[] { "Aurdino", "MacBook Air", "BhakBencho"};
+      		String[] invObjects = new String[] { "Aurdino", "MacBook Air", "MarioBros."};
+      		int[] invObjType = new int[] {CONSTANTS.TXT, CONSTANTS.TXT, CONSTANTS.JPG};
       		String[] invObjectsInfo = new String[] { "Aurdino: in dino dil mera..", 
-      				"MacBook Air: hawa hawai!", "BhakBencho: kya chutyaap hai!"};
+      				"MacBook Air: hawa hawai!",
+      				"http://blog.8bitlibrary.com/wp-content/uploads/2010/02/super-mario-bros1.jpg"};
+      		long[] sites = new long[] {siteIdList[0], siteIdList[1], siteIdList[0]};
       		for(int i=0; i<invObjects.length; i++){
-      			invObject = inventoryDAO.createInventoryObject(invObjects[i], "txt", invObjectsInfo[i]);
-      			adapter.add(invObject);
+      			invObject = inventoryDAO.createInventoryObject(invObjects[i], invObjType[i], invObjectsInfo[i], sites[i]);
+      			//adapter.add(invObject);
       		}
+      		
+      		List<InventoryObject> inventoryObjects = inventoryDAO.getAllInventoryObjects(siteId);
+      		Iterator<InventoryObject> it = inventoryObjects.iterator();
+      		while(it.hasNext()){
+      			adapter.add(it.next());
+      		}      		
       		adapter.notifyDataSetChanged();
       		
       		setListAdapter(adapter);      	

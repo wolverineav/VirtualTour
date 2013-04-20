@@ -1,5 +1,8 @@
 package com.xylyx.virtualtourtabbed;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,7 +11,13 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.xylyx.virtualtourtabbed.DAO.CONSTANTS;
+import com.xylyx.virtualtourtabbed.DAO.InventoryObjectDAO;
+import com.xylyx.virtualtourtabbed.Objects.InventoryObject;
 
 public class InfoDisplayActivity extends Activity {
 	
@@ -43,11 +52,35 @@ public class InfoDisplayActivity extends Activity {
   		//TextView infoView = new TextView(getBaseContext());
   		//infoView.setText(invObj.getMedia());
   		//infoView.setGravity(Gravity.CENTER);
+  		Log.v("**** MediaType: ", String.valueOf(invObj.getMediaType()));
+  		switch(invObj.getMediaType()){
+  		case CONSTANTS.JPG:
+  			TextView tv = (TextView) findViewById(R.id.textView);
+  			tv.setVisibility(View.INVISIBLE);
+  			ImageView iv = (ImageView) findViewById(R.id.imageView);
+  			iv.setVisibility(View.VISIBLE);
+  			URL url;
+  			try {
+  				url = new URL(invObj.getMedia());
+  				iv.setTag(url.toString());
+  			} catch (MalformedURLException e1) {
+  				// TODO Auto-generated catch block
+  				e1.printStackTrace();
+  			}
+  			new DownloadImageTask().execute(iv);
+  			break;
+  		default:
+  		case CONSTANTS.TXT:
+  			TextView infoView = (TextView) findViewById(R.id.textView);
+  	  		infoView.setText("Retrieved Info: " + invObj.getMedia());
+  	  		infoView.setGravity(Gravity.CENTER);
+  			
+  		}
 
-  		TextView infoView = (TextView) findViewById(R.id.textView);
-  		infoView.setText("Retrieved Info: " + invObj.getMedia());
-  		infoView.setGravity(Gravity.CENTER);
-  		
+  		//TextView infoView = (TextView) findViewById(R.id.textView);
+  		//infoView.setText("Retrieved Info: " + invObj.getMedia());
+  		//infoView.setGravity(Gravity.CENTER);
+ 		
   		//this.setContentView(R.id.textView);
 	  	//setContentView(infoView);
 	}

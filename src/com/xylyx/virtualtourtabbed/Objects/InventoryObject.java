@@ -1,10 +1,11 @@
-package com.xylyx.virtualtourtabbed;
+package com.xylyx.virtualtourtabbed.Objects;
 
 public class InventoryObject {
 	private long id;
 	private String objName;
-	private String mediaType;
+	private int mediaType;
 	private String media;
+	private long siteId;
 	
 	public long getId() {
 		return id;
@@ -18,10 +19,10 @@ public class InventoryObject {
 	public void setObjName(String objName) {
 		this.objName = objName;
 	}
-	public String getMediaType() {
+	public int getMediaType() {
 		return mediaType;
 	}
-	public void setMediaType(String mediaType) {
+	public void setMediaType(int mediaType) {
 		this.mediaType = mediaType;
 	}
 	public String getMedia() {
@@ -31,6 +32,12 @@ public class InventoryObject {
 		this.media = media;
 	}
 	
+	public long getSiteId() {
+		return siteId;
+	}
+	public void setSiteId(long siteId) {
+		this.siteId = siteId;
+	}
 	// will be used by ArrayAdapter
 	@Override
 	public String toString(){
